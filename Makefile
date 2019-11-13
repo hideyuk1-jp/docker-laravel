@@ -1,6 +1,13 @@
+DC=docker-compose
 # Laravel install
 install:
 	@cp .env.example .env
-	@docker-compose up -d
-	@docker-compose exec php composer install
-	@docker-compose exec php php artisan key:generate
+	@$(DC) up -d
+	@make composer C="install"
+	@make artisan C="key:generate"
+
+artisan:
+	@$(DC) exec php php artisan $(C)
+
+composer:
+	@$(DC) exec php composer $(C)
