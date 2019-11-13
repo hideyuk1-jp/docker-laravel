@@ -2,4 +2,5 @@
 install:
 	@cp .env.example .env
 	@docker-compose up -d
-	@docker-compose run --rm composer install
+	@docker-compose exec -it php composer install
+	@docker-compose exec -it php artisan key:generate
