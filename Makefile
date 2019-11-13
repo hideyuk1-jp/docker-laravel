@@ -4,9 +4,9 @@ install:
 	@cp .env.example .env
 	@$(DC) up -d
 	@make composer C="install"
-	@make artisan C="key:generate"
+	@make artisan_ C="key:generate"
 
-artisan:
+artisan_:
 	@$(DC) exec php php artisan $(C)
 
 composer:
