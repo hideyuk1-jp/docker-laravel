@@ -1,8 +1,9 @@
-FROM php:7.2-fpm
+ARG PHP_VERSION=${PHP_VERSION}
+FROM php:${PHP_VERSION}-fpm
 COPY php.ini /usr/local/etc/php/
 
 RUN apt-get update \
-    && apt-get install -y zlib1g-dev default-mysql-client \
+    && apt-get install -y libzip-dev default-mysql-client \
     && docker-php-ext-install zip pdo_mysql
 
 #Compose install
@@ -17,7 +18,6 @@ ENV COMPOSER_HOME /composer
 
 ENV PATH $PATH:/composer/vendor/bin
 RUN mv composer.phar /usr/local/bin/composer
-
 
 WORKDIR /var/www/html
 

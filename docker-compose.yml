@@ -3,12 +3,15 @@ version: '3'
 services:
   php: #phpコンテナを定義します。
     container_name: php #コンテナの名前
-    build: ./docker/php #Dockerイメージがあるディレクトリ
+    build:
+      context: ./docker/php #Dockerイメージがあるディレクトリ
+      args:
+        - PHP_VERSION=${DOCKER_PHP_VERSION}
     volumes:
     - .:/var/www/html #データ永続化領域の定義
 
   nginx:
-    image: nginx #nginxの公式イメージを使用
+    image: nginx:${DOCKER_NGINX_VERSION} #nginxの公式イメージを使用
     container_name: nginx
     ports: #ホスト:コンテナポート間のマッピング
     - 8000:80
@@ -19,13 +22,13 @@ services:
     - php
 
   db:
-    image: mysql:5.7
+    image: mysql:${DOCKER_MYSQL_VERSION}
     container_name: db
     environment: #DB環境定義
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: docker
-      MYSQL_USER: docker
-      MYSQL_PASSWORD: docker
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: 'Asia/Tokyo'
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
@@ -33,4 +36,4 @@ services:
     - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
     - ./docker/db/sql:/docker-entrypoint-initdb.d #image起動時に実行するSQLやスクリプト
     ports:
-    - 3306:3306
+    - ${DB_PORT}:3306
