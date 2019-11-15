@@ -1,6 +1,9 @@
 DC=docker-compose
+STAGE=local
 build:
 	@$(DC) build
+build_nc:
+	@$(DC) build --no-cache
 up:
 	@$(DC) up -d
 down:
@@ -16,10 +19,11 @@ exec:
 	@$(DC) exec $(NAME) bash
 
 install:
-	@cp .env.example .env
+	@cp .env.$(STAGE) .env
 	@$(DC) up -d
 	@make composer C="install"
 	@make artisan_ C="key:generate"
+	@make npm_run_dev
 
 artisan_:
 	@$(DC) exec php php artisan $(C)
@@ -29,3 +33,6 @@ composer:
 
 npm:
 	@$(DC) exec php npm $(C)
+
+npm_run_dev:
+	@make npm C="run dev"

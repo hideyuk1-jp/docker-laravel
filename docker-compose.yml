@@ -1,30 +1,48 @@
 version: '3'
 
 services:
-  php: #phpコンテナを定義します。
-    container_name: php #コンテナの名前
+  php:
+    container_name: php
     build:
-      context: ./docker/php #Dockerイメージがあるディレクトリ
+      context: ./docker/php
       args:
         - PHP_VERSION=${DOCKER_PHP_VERSION}
+        - NODE_VERSION=${DOCKER_NODE_VERSION}
+        - CONTAINER_SRC_ROOT=${DOCKER_CONTAINER_SRC_ROOT}
     volumes:
-    - .:/var/www/html #データ永続化領域の定義
+    - .:${DOCKER_CONTAINER_SRC_ROOT}:cached
 
   nginx:
-    image: nginx:${DOCKER_NGINX_VERSION} #nginxの公式イメージを使用
+    image: nginx:${DOCKER_NGINX_VERSION}
     container_name: nginx
-    ports: #ホスト:コンテナポート間のマッピング
-    - 8000:80
+    environment:
+      - DOMAIN=${DOCKER_DOMAIN}
+      - DOCUMENT_ROOT=${DOCKER_CONTAINER_SRC_ROOT}/public
+      - HTTP_PORT=${DOCKER_HTTP_PORT}
+      - HTTPS_PORT=${DOCKER_HTTPS_PORT}
+    command: >
+      /bin/sh -c
+      "envsubst '
+      $$DOCUMENT_ROOT
+      $$DOMAIN
+      $$HTTP_PORT
+      $$HTTPS_PORT
+      '< /etc/nginx/conf.d/default.conf.template
+      > /etc/nginx/conf.d/default.conf
+      && nginx -g 'daemon off;'"
+    ports:
+      - '${DOCKER_HTTP_PORT}:80'
+      - '${DOCKER_HTTPS_PORT}:443'
     volumes:
-    - .:/var/www/html
-    - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on: # コンテナ起動順番の制御、phpコンテナのあとにnginxコンテナを起動
+      - .:${DOCKER_CONTAINER_SRC_ROOT}:cached
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
     - php
 
   db:
     image: mysql:${DOCKER_MYSQL_VERSION}
     container_name: db
-    environment: #DB環境定義
+    environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
@@ -32,8 +50,8 @@ services:
       TZ: 'Asia/Tokyo'
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-    - ./docker/db/data:/var/lib/mysql
-    - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
-    - ./docker/db/sql:/docker-entrypoint-initdb.d #image起動時に実行するSQLやスクリプト
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/db/sql:/docker-entrypoint-initdb.d
     ports:
-    - ${DB_PORT}:3306
+      - ${DB_PORT}:3306
