@@ -4,7 +4,14 @@ COPY php.ini /usr/local/etc/php/
 
 RUN apt-get update \
     && apt-get install -y libzip-dev default-mysql-client \
+    && apt-get install -y unzip \
     && docker-php-ext-install zip pdo_mysql
+RUN apt-get install -y \
+    curl \
+    gnupg
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN apt-get install -y nodejs
+RUN npm install npm@latest -g
 
 #Compose install
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"

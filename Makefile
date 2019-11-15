@@ -26,3 +26,6 @@ artisan_:
 
 composer:
 	@$(DC) exec php composer $(C)
+
+npm:
+	@$(DC) exec php npm $(C)
