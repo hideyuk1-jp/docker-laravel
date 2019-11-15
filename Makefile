@@ -23,6 +23,7 @@ install:
 	@$(DC) up -d
 	@make composer C="install"
 	@make artisan_ C="key:generate"
+	@make npm C="install"
 	@make npm_run_dev
 
 artisan_:
