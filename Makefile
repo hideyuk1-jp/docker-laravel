@@ -32,6 +32,9 @@ artisan_:
 composer:
 	@$(DC) exec php composer $(C)
 
+phpunit:
+	@$(DC) exec php vendor/bin/phpunit $(C)
+
 npm:
 	@$(DC) exec php npm $(C)
 
