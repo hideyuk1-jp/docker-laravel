@@ -97,7 +97,7 @@ return [
             'prefix' => '',
             'options' => [
                 // テストデータの永続化
-                PDO::AFTER_PERSISTENT => false,
+                PDO::ATTR_PERSISTENT => false,
             ],
         ],
 
