@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\Events\TransactionRolledBack;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,11 @@ use Illuminate\Support\ServiceProvider;
 
 class DataBaseQueryServiceProvider extends ServiceProvider
 {
+    const ENABLE_ENVIRONMENT = [
+        'local',
+        'development',
+    ];
+
     /**
      * Register services.
      *
